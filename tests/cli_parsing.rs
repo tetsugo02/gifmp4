@@ -20,7 +20,7 @@ fn parses_convert_with_default_options() {
             assert_eq!(output_width, None);
             assert_eq!(constant_rate_factor, 23);
         }
-        CliCommand::Doctor => panic!("expected convert command"),
+        CliCommand::Batch { .. } | CliCommand::Doctor => panic!("expected convert command"),
     }
 }
 
@@ -54,7 +54,7 @@ fn parses_convert_with_all_options() {
             assert_eq!(output_width, Some(640));
             assert_eq!(constant_rate_factor, 18);
         }
-        CliCommand::Doctor => panic!("expected convert command"),
+        CliCommand::Batch { .. } | CliCommand::Doctor => panic!("expected convert command"),
     }
 }
 
@@ -71,4 +71,39 @@ fn rejects_non_numeric_option_values() {
         Cli::try_parse_from(["gifmp4", "convert", "input.gif", "--fps", "fast"]).unwrap_err();
 
     assert!(error.to_string().contains("invalid value"));
+}
+
+#[test]
+fn parses_batch_with_output_directory_and_options() {
+    let cli = Cli::try_parse_from([
+        "gifmp4",
+        "batch",
+        "media/**/*.gif",
+        "--output-dir",
+        "converted",
+        "--fps",
+        "15",
+        "--width",
+        "480",
+        "--quality",
+        "20",
+    ])
+    .unwrap();
+
+    match cli.command {
+        CliCommand::Batch {
+            pattern,
+            output_dir,
+            frames_per_second,
+            output_width,
+            constant_rate_factor,
+        } => {
+            assert_eq!(pattern, "media/**/*.gif");
+            assert_eq!(output_dir, Some(PathBuf::from("converted")));
+            assert_eq!(frames_per_second, 15);
+            assert_eq!(output_width, Some(480));
+            assert_eq!(constant_rate_factor, 20);
+        }
+        CliCommand::Convert { .. } | CliCommand::Doctor => panic!("expected batch command"),
+    }
 }

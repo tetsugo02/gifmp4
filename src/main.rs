@@ -21,6 +21,20 @@ fn main() -> Result<()> {
             };
             converter::convert(&input_path, output_path.as_deref(), &conversion_options)
         }
+        CliCommand::Batch {
+            pattern,
+            output_dir,
+            frames_per_second,
+            output_width,
+            constant_rate_factor,
+        } => {
+            let conversion_options = ConversionOptions {
+                frames_per_second,
+                output_width,
+                constant_rate_factor,
+            };
+            converter::convert_batch(&pattern, output_dir.as_deref(), &conversion_options)
+        }
         CliCommand::Doctor => ffmpeg::doctor(),
     }
 }
