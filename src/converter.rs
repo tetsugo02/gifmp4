@@ -296,7 +296,10 @@ mod tests {
     use super::*;
     use std::fs;
     use std::path::{Path, PathBuf};
+    use std::sync::atomic::{AtomicU64, Ordering};
     use std::time::{SystemTime, UNIX_EPOCH};
+
+    static TEMPORARY_DIRECTORY_SEQUENCE: AtomicU64 = AtomicU64::new(0);
 
     fn options() -> ConversionOptions {
         ConversionOptions {
@@ -312,8 +315,9 @@ mod tests {
             .unwrap()
             .as_nanos();
         let path = std::env::temp_dir().join(format!(
-            "gifmp4-converter-test-{}-{unique}",
-            std::process::id()
+            "gifmp4-converter-test-{}-{unique}-{}",
+            std::process::id(),
+            TEMPORARY_DIRECTORY_SEQUENCE.fetch_add(1, Ordering::Relaxed)
         ));
         fs::create_dir(&path).unwrap();
         path

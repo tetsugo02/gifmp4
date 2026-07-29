@@ -86,6 +86,10 @@ fn bundled_ffmpeg_candidate() -> Result<PathBuf> {
     let current_executable_path =
         std::env::current_exe().context("現在の実行ファイルのパスを取得できませんでした")?;
 
+    bundled_ffmpeg_candidate_for(&current_executable_path)
+}
+
+fn bundled_ffmpeg_candidate_for(current_executable_path: &std::path::Path) -> Result<PathBuf> {
     let executable_directory = current_executable_path
         .parent()
         .context("実行ファイルの親ディレクトリを取得できませんでした")?;
@@ -101,4 +105,26 @@ fn bundled_ffmpeg_candidate() -> Result<PathBuf> {
     };
 
     Ok(package_directory.join("libexec").join(ffmpeg_filename))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::path::Path;
+
+    #[test]
+    fn finds_ffmpeg_next_to_the_package_bin_directory() {
+        let executable = if cfg!(target_os = "windows") {
+            Path::new("package/bin/gifmp4.exe")
+        } else {
+            Path::new("package/bin/gifmp4")
+        };
+        let expected = if cfg!(target_os = "windows") {
+            PathBuf::from("package/libexec/ffmpeg.exe")
+        } else {
+            PathBuf::from("package/libexec/ffmpeg")
+        };
+
+        assert_eq!(bundled_ffmpeg_candidate_for(executable).unwrap(), expected);
+    }
 }

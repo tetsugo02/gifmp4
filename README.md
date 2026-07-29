@@ -19,6 +19,7 @@ FFmpegを利用してGIFとMP4を相互変換する、Rust製のコマンドラ�
 
 - Rust（ソースからビルドする場合）
 - FFmpeg
+- `curl`と`unzip`（同梱パッケージを作成する場合）
 
 FFmpegは次の優先順位で探索されます。
 
@@ -43,6 +44,72 @@ target/release/gifmp4
 ```bash
 cargo run -- doctor
 ```
+
+## FFmpeg同梱パッケージの作成
+
+配布先にFFmpegがインストールされていなくても使えるよう、次の構成のローカル配布パッケージを作成できます。
+
+```text
+gifmp4/
+├── bin/
+│   └── gifmp4
+├── libexec/
+│   └── ffmpeg
+└── licenses/
+    ├── FFmpeg-NOTICE.md
+    └── ffmpeg/
+        └── LICENSE・COPYINGファイル
+```
+
+対象OS・CPU向けに固定されたFFmpeg 8.1.2をダウンロードしてSHA-256を検証し、`dist/gifmp4`へ出力します。
+
+```bash
+./scripts/package-local.sh
+```
+
+別の出力先を指定することもできます。既存のディレクトリは誤上書きを防ぐため受け付けません。
+
+```bash
+./scripts/package-local.sh /tmp/gifmp4
+```
+
+現在対応している対象：
+
+- `darwin-arm64`: Apple Silicon搭載Mac
+- `darwin-x64`: Intel搭載Mac
+- `linux-x64`: x86_64 Linux
+
+FFmpegのURL、バージョン、チェックサム、ライセンスURLは[`packaging/ffmpeg-artifacts.tsv`](packaging/ffmpeg-artifacts.tsv)で一元管理しています。`latest` URLは使用しないため、配布元の更新によって意図せずFFmpegが変わることはありません。
+
+バージョン付きのリリースアーカイブを作成する場合：
+
+```bash
+./scripts/package-release.sh darwin-arm64
+```
+
+出力例：
+
+```text
+dist/gifmp4-0.1.0-darwin-arm64.tar.gz
+```
+
+### ローカル配布テスト
+
+次のスクリプトは一時ディレクトリへパッケージを作成し、FFmpegが`PATH`に存在しない状態で以下を検証します。
+
+- `bin/gifmp4 doctor`が`libexec/ffmpeg`を発見する
+- 同梱FFmpegを使って実際にGIFからMP4へ変換できる
+- 必要なバイナリとライセンスディレクトリが存在する
+
+```bash
+./scripts/test-local-distribution.sh
+```
+
+### 実際に配布する際の注意
+
+同梱FFmpegは[Martin Riedl's FFmpeg Build Server](https://ffmpeg.martin-riedl.de/)のFFmpeg 8.1.2固定リリースから取得します。配布物にはgifmp4のMITライセンス、FFmpegのGPLv3ライセンス、第三者配布に関する注意書きが含まれます。
+
+FFmpegと静的リンクされたライブラリにはGPLなどの条件が適用されます。同梱ファイルだけで配布者のすべての義務が自動的に満たされることを保証するものではありません。公開前に、対象バイナリのビルド情報、ソースコード提供義務、特許などの条件を確認してください。
 
 ## 単一ファイルの変換
 
@@ -210,6 +277,38 @@ Clippyで静的解析を実行します。
 ```bash
 cargo clippy --all-targets -- -D warnings
 ```
+
+## CI/CD
+
+GitHub ActionsのCIは、`main`へのpush、Pull Request、手動実行で動作します。
+
+- フォーマット確認
+- 全テスト
+- Clippy
+- macOS arm64、macOS x64、Linux x64向け配布アーカイブの作成
+- 同梱FFmpegを使ったローカル配布テスト
+- ビルド成果物のArtifactへの保存
+
+`Cargo.toml`のバージョンと一致するタグをpushすると、自動的にGitHub Releaseを作成します。
+
+```bash
+git tag v0.1.0
+git push origin v0.1.0
+```
+
+Releaseには次のアーカイブが添付されます。
+
+```text
+gifmp4-0.1.0-darwin-arm64.tar.gz
+gifmp4-0.1.0-darwin-x64.tar.gz
+gifmp4-0.1.0-linux-x64.tar.gz
+```
+
+## ライセンス
+
+gifmp4本体は[MIT License](LICENSE)で提供されます。
+
+配布物に同梱されるFFmpegは別のソフトウェアであり、FFmpegおよび静的リンクされたライブラリのライセンス条件が適用されます。詳細は配布物の`licenses/`を確認してください。
 
 ## 対応する変換
 

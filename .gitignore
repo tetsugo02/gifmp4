@@ -1,4 +1,5 @@
 /target
+/dist
 
 *.mp4
 *.gif
