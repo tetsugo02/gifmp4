@@ -38,5 +38,5 @@ fn normalize_path(path: &Path) -> Result<String> {
         .and_then(|extension| extension.to_str())
         .context("There is no extension in the input file path")?;
 
-    return Ok(extension.to_ascii_lowercase());
+    Ok(extension.to_ascii_lowercase())
 }
