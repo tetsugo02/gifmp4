@@ -48,6 +48,11 @@ jobs:
         run: ./scripts/test-local-distribution.sh
         env:
           GIFMP4_PACKAGE_TARGET: ${{ matrix.target }}
+      - name: Test curl installer
+        shell: bash
+        run: |
+          version=$(sed -n 's/^version = "\([^"]*\)"/\1/p' Cargo.toml | head -n 1)
+          ./scripts/test-install.sh "dist/gifmp4-${version}-${{ matrix.target }}.tar.gz"
       - uses: actions/upload-artifact@v4
         with:
           name: gifmp4-${{ matrix.target }}

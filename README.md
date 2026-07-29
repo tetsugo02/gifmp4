@@ -3,6 +3,50 @@
 FFmpegを利用してGIFとMP4を相互変換する、Rust製のコマンドラインツールです。
 単一ファイルの変換に加え、globパターンを使った一括変換にも対応しています。
 
+## インストール
+
+macOSまたはx86_64 Linuxでは、次の1行で最新版をインストールできます。
+
+```bash
+curl -fsSL https://github.com/tetsugo02/gifmp4/releases/latest/download/install.sh | sh && export PATH="$HOME/.local/bin:$PATH"
+```
+
+インストーラーはOSとCPUを自動判定し、対応するReleaseアーカイブのSHA-256を検証して、次の場所へ配置します。
+
+```text
+~/.local/
+├── bin/
+│   └── gifmp4 -> ../share/gifmp4/versions/<VERSION>/bin/gifmp4
+└── share/
+    └── gifmp4/
+        └── versions/
+            └── <VERSION>/
+                ├── bin/gifmp4
+                ├── libexec/ffmpeg
+                └── licenses/
+```
+
+`~/.local/bin`が現在の`PATH`にない場合は、使用中のシェルに応じて`~/.zshrc`、`~/.bashrc`、または`~/.profile`へ設定を追記します。上記コマンド末尾の`export`により、シェルを開き直さなくてもすぐに利用できます。
+
+```bash
+gifmp4 doctor
+```
+
+特定バージョンをインストールする場合：
+
+```bash
+curl -fsSL https://github.com/tetsugo02/gifmp4/releases/download/v0.1.0/install.sh | GIFMP4_VERSION=0.1.0 sh
+```
+
+アンインストールする場合：
+
+```bash
+rm "$HOME/.local/bin/gifmp4"
+rm -rf "$HOME/.local/share/gifmp4"
+```
+
+シェル設定ファイルに追加された`# Added by the gifmp4 installer`と、その次のPATH設定行も削除してください。
+
 ## 主な機能
 
 - GIFからMP4への変換
@@ -287,6 +331,7 @@ GitHub ActionsのCIは、`main`へのpush、Pull Request、手動実行で動作
 - Clippy
 - macOS arm64、macOS x64、Linux x64向け配布アーカイブの作成
 - 同梱FFmpegを使ったローカル配布テスト
+- `curl`インストーラーの実行テスト
 - ビルド成果物のArtifactへの保存
 
 `Cargo.toml`のバージョンと一致するタグをpushすると、自動的にGitHub Releaseを作成します。
@@ -302,6 +347,8 @@ Releaseには次のアーカイブが添付されます。
 gifmp4-0.1.0-darwin-arm64.tar.gz
 gifmp4-0.1.0-darwin-x64.tar.gz
 gifmp4-0.1.0-linux-x64.tar.gz
+SHA256SUMS
+install.sh
 ```
 
 ## ライセンス

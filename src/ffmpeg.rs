@@ -85,8 +85,10 @@ pub fn doctor() -> Result<()> {
 fn bundled_ffmpeg_candidate() -> Result<PathBuf> {
     let current_executable_path =
         std::env::current_exe().context("現在の実行ファイルのパスを取得できませんでした")?;
+    let resolved_executable_path =
+        std::fs::canonicalize(&current_executable_path).unwrap_or(current_executable_path);
 
-    bundled_ffmpeg_candidate_for(&current_executable_path)
+    bundled_ffmpeg_candidate_for(&resolved_executable_path)
 }
 
 fn bundled_ffmpeg_candidate_for(current_executable_path: &std::path::Path) -> Result<PathBuf> {
