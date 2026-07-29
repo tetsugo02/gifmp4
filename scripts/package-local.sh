@@ -50,8 +50,27 @@ download_directory="$temporary_directory/download"
 
 mkdir -p "$package_directory/bin" "$package_directory/libexec" "$package_directory/licenses"
 
-cargo build --release --locked --manifest-path "$project_directory/Cargo.toml"
-cp "$project_directory/target/release/gifmp4" "$package_directory/bin/gifmp4"
+case "$package_target" in
+    linux-x64)
+        rust_target=x86_64-unknown-linux-musl
+        cargo build \
+            --release \
+            --locked \
+            --target "$rust_target" \
+            --manifest-path "$project_directory/Cargo.toml"
+        gifmp4_binary="$project_directory/target/$rust_target/release/gifmp4"
+        ;;
+    darwin-arm64|darwin-x64)
+        cargo build --release --locked --manifest-path "$project_directory/Cargo.toml"
+        gifmp4_binary="$project_directory/target/release/gifmp4"
+        ;;
+    *)
+        echo "Unsupported package target: $package_target" >&2
+        exit 1
+        ;;
+esac
+
+cp "$gifmp4_binary" "$package_directory/bin/gifmp4"
 cp "$download_directory/ffmpeg" "$package_directory/libexec/ffmpeg"
 cp "$project_directory/LICENSE" "$package_directory/licenses/gifmp4-MIT.txt"
 cp "$project_directory/packaging/FFmpeg-NOTICE.md" "$package_directory/licenses/FFmpeg-NOTICE.md"

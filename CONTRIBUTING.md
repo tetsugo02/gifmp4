@@ -11,6 +11,8 @@
 - `unzip`
 - `tar`
 
+Linux配布物を作成する場合は、musl toolchain、`musl-tools`、`readelf`、Dockerも必要です。gifmp4本体は`x86_64-unknown-linux-musl`向けにビルドされます。
+
 配布パッケージ関連のスクリプトは、対応するOS・CPU向けの固定されたFFmpegをダウンロードします。そのため、実行時にはネットワーク接続が必要です。
 
 対応する配布ターゲット：
@@ -136,6 +138,12 @@ gifmp4/
 
 `<VERSION>`は`Cargo.toml`のバージョンに置き換えてください。
 
+Linux版では、gifmp4とFFmpegに動的ELFインタープリタがないことを確認し、Ubuntu 20.04コンテナ内で`doctor`を実行します。
+
+```bash
+./scripts/test-linux-compatibility.sh dist/gifmp4-<VERSION>-linux-x64.tar.gz
+```
+
 ## FFmpegの固定バージョンを更新する
 
 FFmpegのURL、バージョン、アーカイブのSHA-256、ライセンスURLは[`packaging/ffmpeg-artifacts.tsv`](packaging/ffmpeg-artifacts.tsv)で管理しています。
@@ -148,7 +156,7 @@ FFmpegのURL、バージョン、アーカイブのSHA-256、ライセンスURL�
 4. 再配布に必要なライセンスと通知を更新する
 5. ローカル配布テストとGitHub Actionsが成功する
 
-同梱FFmpegは現在、[Martin Riedl's FFmpeg Build Server](https://ffmpeg.martin-riedl.de/)から取得しています。配布物にはgifmp4のMITライセンス、FFmpegのGPLv3ライセンス、第三者配布に関する注意書きが含まれます。
+macOS版FFmpegは[Martin Riedl's FFmpeg Build Server](https://ffmpeg.martin-riedl.de/)から、Linux x64版の静的FFmpegは[`eugeneware/ffmpeg-static`](https://github.com/eugeneware/ffmpeg-static/releases/tag/b6.1.1)の固定GitHub Releaseから取得しています。配布物にはgifmp4のMITライセンス、FFmpegのGPLv3ライセンス、第三者配布に関する注意書きが含まれます。
 
 FFmpegや静的リンクされたライブラリの配布条件が、同梱ファイルだけですべて満たされるとは限りません。公開前にビルド情報、対応するソースコードの提供義務、特許などの条件を確認してください。
 
@@ -167,6 +175,7 @@ Pull Requestでは次のCIが実行されます。
 - Clippy
 - macOS arm64、macOS x64、Linux x64向け配布アーカイブの作成
 - 同梱FFmpegによる実変換
+- Linux実行ファイルの静的リンク確認とUbuntu 20.04での起動
 - `curl`インストーラーの実行
 
 ## リリース手順

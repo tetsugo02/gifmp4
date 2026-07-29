@@ -38,6 +38,8 @@ gifmp4 convert video.mp4
 - Intel搭載Mac
 - x86_64 Linux
 
+Linux版はgifmp4本体と同梱FFmpegを静的リンクしているため、特定バージョンのglibcを必要としません。
+
 ファイルは`~/.local/share/gifmp4`へ配置され、`~/.local/bin/gifmp4`から実行できるようになります。`~/.local/bin`が`PATH`にない場合、インストーラーが使用中のシェル設定へ追記します。
 
 特定バージョンをインストールする場合：

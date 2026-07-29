@@ -41,6 +41,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
+      - name: Install musl build tools
+        if: matrix.target == 'linux-x64'
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends --yes binutils musl-tools
+          rustup target add x86_64-unknown-linux-musl
       - name: Verify tag matches Cargo.toml
         shell: bash
         run: |
@@ -57,6 +63,12 @@ jobs:
         run: |
           version=$(sed -n 's/^version = "\([^"]*\)"/\1/p' Cargo.toml | head -n 1)
           ./scripts/test-install.sh "dist/gifmp4-${version}-${{ matrix.target }}.tar.gz"
+      - name: Test compatibility with older Linux
+        if: matrix.target == 'linux-x64'
+        shell: bash
+        run: |
+          version=$(sed -n 's/^version = "\([^"]*\)"/\1/p' Cargo.toml | head -n 1)
+          ./scripts/test-linux-compatibility.sh "dist/gifmp4-${version}-linux-x64.tar.gz"
       - uses: actions/upload-artifact@v4
         with:
           name: gifmp4-${{ matrix.target }}

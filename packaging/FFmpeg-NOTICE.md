@@ -1,9 +1,15 @@
 # FFmpeg distribution notice
 
-The `libexec/ffmpeg` executable in this package is a fixed FFmpeg 8.1.2 build
-provided by Martin Riedl's FFmpeg Build Server:
+The `libexec/ffmpeg` executable in this package is a fixed FFmpeg build.
+The macOS packages use FFmpeg 8.1.2 provided by Martin Riedl's FFmpeg Build
+Server:
 
 https://ffmpeg.martin-riedl.de/
+
+The Linux x64 package uses the statically linked FFmpeg 7.0.2 binary from the
+`eugeneware/ffmpeg-static` b6.1.1 GitHub Release:
+
+https://github.com/eugeneware/ffmpeg-static/releases/tag/b6.1.1
 
 FFmpeg itself is a separate project and is available from:
 

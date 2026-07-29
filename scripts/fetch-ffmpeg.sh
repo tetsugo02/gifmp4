@@ -17,13 +17,15 @@ binary_sha256=
 license_url=
 license_sha256=
 archive_format=
+ffmpeg_version=
 
-while IFS='|' read -r manifest_target manifest_archive_format manifest_binary_url manifest_binary_sha256 manifest_license_url manifest_license_sha256; do
+while IFS='|' read -r manifest_target manifest_ffmpeg_version manifest_archive_format manifest_binary_url manifest_binary_sha256 manifest_license_url manifest_license_sha256; do
     case "$manifest_target" in
         ""|\#*) continue ;;
     esac
 
     if [ "$manifest_target" = "$target" ]; then
+        ffmpeg_version=$manifest_ffmpeg_version
         archive_format=$manifest_archive_format
         binary_url=$manifest_binary_url
         binary_sha256=$manifest_binary_sha256
@@ -67,7 +69,7 @@ trap 'rm -rf "$temporary_directory"' EXIT HUP INT TERM
 binary_archive="$temporary_directory/ffmpeg.$archive_format"
 license_file="$temporary_directory/FFmpeg-LICENSE.txt"
 
-echo "Downloading fixed FFmpeg 8.1.2 for $target..."
+echo "Downloading fixed FFmpeg $ffmpeg_version for $target..."
 curl --fail --location --silent --show-error --output "$binary_archive" "$binary_url"
 curl --fail --location --silent --show-error --output "$license_file" "$license_url"
 
@@ -90,4 +92,4 @@ esac
 cp "$license_file" "$output_directory/licenses/FFmpeg-LICENSE.txt"
 chmod 755 "$output_directory/ffmpeg"
 
-echo "FFmpeg 8.1.2 downloaded and verified for $target."
+echo "FFmpeg $ffmpeg_version downloaded and verified for $target."
