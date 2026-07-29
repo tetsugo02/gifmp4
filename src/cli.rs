@@ -17,7 +17,7 @@ pub enum CliCommand {
         output_path: Option<PathBuf>,
 
         #[arg(long = "fps", default_value_t = 30)]
-        frame_per_second: u32,
+        frames_per_second: u32,
 
         #[arg(long = "width")]
         output_width: Option<u32>,
@@ -25,10 +25,6 @@ pub enum CliCommand {
         /// H.264 CRF used for GIF to MP4 conversion
         #[arg(long = "quality", default_value_t = 23)]
         constant_rate_factor: u8,
-
-        /// Overwrite an existing output file
-        #[arg(short = 'y', long)]
-        overwrite: bool,
     },
     /// Check whether ffmpeg is installed and available in the system PATH
     Doctor,
