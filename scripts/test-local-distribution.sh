@@ -20,7 +20,9 @@ test -f "$package_directory/licenses/FFmpeg-NOTICE.md"
 
 doctor_output=$(PATH="$empty_path_directory" "$package_directory/bin/gifmp4" doctor 2>&1)
 printf '%s\n' "$doctor_output"
-printf '%s\n' "$doctor_output" | grep -F "$package_directory/libexec/ffmpeg" >/dev/null
+resolved_package_directory=$(CDPATH= cd -- "$package_directory" && pwd -P)
+printf '%s\n' "$doctor_output" |
+    grep -F "$resolved_package_directory/libexec/ffmpeg" >/dev/null
 printf '%s\n' "$doctor_output" | grep -F "FFmpeg is available." >/dev/null
 
 "$package_directory/libexec/ffmpeg" \
